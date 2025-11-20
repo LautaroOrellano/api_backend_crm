@@ -1,7 +1,11 @@
-# main.py
-from pipelines.sample_pipeline import run_sample
-from db import connection as db_conn
+from fastapi import FastAPI
+from app.api.v1.customers import router as customer_router
 
-if __name__ == "__main__":
-    db_conn.init_pool()
-    run_sample()
+app = FastAPI(title="Customer Manager API")
+
+# Registrar routers
+app.include_router(customer_router, prefix="/customers", tags=["Customers"])
+
+@app.get("/")
+def root():
+    return {"message": "Customer Manager API running"}
