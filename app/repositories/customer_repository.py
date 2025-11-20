@@ -1,8 +1,8 @@
 # repositories/customer_repository.py
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from app.models.customer import Customer, CustomerCreate
-
+from app.schemas.customer_schema import CustomerCreate
+from app.models.customer import Customer
 
 class CustomerRepository:
 
