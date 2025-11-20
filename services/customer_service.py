@@ -1,7 +1,7 @@
-# services/cliente_service.py
-from db.connection import get_connection
+# services/CustomerService.py
+from db.Connection import get_connection
 from mysql.connector import Error
-from models.cliente import Cliente
+from models.Customer import Cliente
 
 def agregar_cliente(cliente: Cliente):
     conexion = None
