@@ -39,7 +39,7 @@ class CustomerCreate(BaseModel):
 # =========================
 # OUTPUT (para devolver al cliente)
 # =========================
-class CustomerDB(BaseModel):
+class CustomerRead(BaseModel):
     id: int
     full_name: str
     email: Optional[EmailStr]
