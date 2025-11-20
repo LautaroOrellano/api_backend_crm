@@ -1,12 +1,7 @@
 # main.py
-from models.cliente import Cliente
-from services.cliente_service import agregar_cliente, obtener_clientes
+from pipelines.sample_pipeline import run_sample
+from db import connection as db_conn
 
-# Crear un cliente
-nuevo = Cliente("Lautaro", "lautaro@gmail.com", "2236052979", "Cliente VIP")
-agregar_cliente(nuevo)
-
-# Mostrar todos los clientes
-clientes = obtener_clientes()
-for c in clientes:
-    print(c)
+if __name__ == "__main__":
+    db_conn.init_pool()
+    run_sample()
