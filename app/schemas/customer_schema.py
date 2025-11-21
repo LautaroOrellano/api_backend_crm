@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr, Field, field_validator
@@ -19,7 +20,10 @@ class CustomerCreate(BaseModel):
 
     @field_validator("full_name")
     def validate_name(cls, v):
-        return v.strip().title()
+        v = v.strip().title()
+        if not re.fullmatch(r"[A-Za-zÁÉÍÓÚáéíóúÑñ ]+", v):
+            raise ValueError("Full name must contain only letters and spaces")
+        return v
 
     @field_validator("phone")
     def validate_phone(cls, v):
@@ -35,6 +39,13 @@ class CustomerCreate(BaseModel):
         if not v:
             return []
         return [t.strip().lower() for t in v]
+
+    @field_validator("status")
+    def validate_status(cls, v):
+        allowed_status = [s.value for s in LeadStatus]
+        if v.value not in allowed_status:
+            raise ValueError(f"Status must be one of {allowed_status}")
+        return v
 
 # =========================
 # OUTPUT (para devolver al cliente)
@@ -52,3 +63,21 @@ class CustomerRead(BaseModel):
     updated_at: Optional[datetime]
 
     model_config = {"from_attributes": True}
+
+# =========================
+# QUERY PARAMS (filtros + paginación)
+# =========================
+class CustomerQuery(BaseModel):
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    source: Optional[str] = None
+    status: Optional[str] = None
+    q: Optional[str] = None
+    limit: int = Field(20, ge=1, le=100)
+    offset: int = Field(0, ge=0)
+    order_by: str = "created_at"
+    order_dir: str = "desc"
+
+    # Filtros avanzados
+    created_from: Optional[datetime] = None
+    created_to: Optional[datetime] = None
