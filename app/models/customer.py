@@ -1,6 +1,6 @@
 # app/models/customer.py
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, JSON, Enum as SAEnum
+from sqlalchemy import Column, Boolean, Integer, String, DateTime, JSON, Enum as SAEnum
 from app.db.base import Base
 from app.enums.lead_status import LeadStatus
 from app.enums.lead_source import LeadSource
@@ -21,3 +21,6 @@ class Customer(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    is_deleted = Column(Boolean, default=False, nullable=False)
+    deleted_at = Column(DateTime, nullable=False)
