@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from app.schemas.customer_schema import CustomerCreate, CustomerRead
+from app.schemas.customer_schema import CustomerCreate, CustomerRead, CustomerQuery
+from app.schemas.pagination import Page
 from app.services.customer_service import CustomerService
 from app.db.session import get_connection
 
@@ -10,13 +11,12 @@ router = APIRouter()
 def create_customer(payload: CustomerCreate, db: Session = Depends(get_connection)):
     return CustomerService.create_customer(db, payload)
 
-@router.get("/", response_model=list[CustomerRead])
-def list_customers(db: Session = Depends(get_connection)):
-    customers = CustomerService.list_customers(db)
-    if not customers:
-        return []
-
-    return customers
+@router.get("/", response_model=Page[CustomerRead])
+def list_customers(
+    filters: CustomerQuery = Depends(),
+    db: Session = Depends(get_connection)
+):
+    return CustomerService.list_customers(db, filters)
 
 @router.get("/{customer_id}", response_model=CustomerRead)
 def get_customer(customer_id: int, db: Session = Depends(get_connection)):
