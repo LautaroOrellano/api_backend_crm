@@ -1,6 +1,6 @@
 # app/schemas/user_schema.py
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
+from typing import Optional, ClassVar
 from datetime import datetime
 
 # -----------------------------
@@ -22,12 +22,14 @@ class UserCreate(UserBase):
 # -----------------------------
 class UserRead(UserBase):
     id: int
-    is_active: bool
+    username: str
+    email: EmailStr
+    full_name: Optional[str]
+    role: str
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config: ClassVar[dict] = {"from_attributes": True}
 
 # -----------------------------
 # User para login
@@ -55,3 +57,28 @@ class UserMe(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+# =========================
+# QUERY PARAMS (filtros + paginación)
+# =========================
+class UserQuery(BaseModel):
+    username: Optional[str] = None
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    role: Optional[str] = None
+    is_deleted: Optional[bool] = None
+    q: Optional[str] = None
+
+    # Paginación
+    limit: int = Field(20, ge=1, le=100)
+    offset: int = Field(0, ge=0)
+
+    # Ordenamiento
+    order_by: str = "created_at"  # columnas como created_at, username, email
+    order_dir: str = "desc"
+
+    # Filtros por fechas
+    created_from: Optional[datetime] = None
+    created_to: Optional[datetime] = None
+    updated_from: Optional[datetime] = None
+    updated_to: Optional[datetime] = None
