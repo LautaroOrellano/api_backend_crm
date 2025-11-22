@@ -125,3 +125,17 @@ class CustomerService:
         CustomerRepository.soft_delete(db, customer)
 
         return True
+
+    # =========================
+    # REACTIVE
+    # =========================
+    def reactivate_customer(db: Session, customer_id: int, user: User) -> CustomerRead:
+        customer = CustomerRepository.get_customer_by_id_for_reactivation(db, customer_id)
+        if not customer:
+            raise HTTPException(status_code=404, detail="Customer not found")
+
+        if user.role != "admin":
+            raise HTTPException(status_code=403, detail="Only admin can reactivate customers")
+
+        customer = CustomerRepository.reactivate_customer(db, customer)
+        return CustomerRead.model_validate(customer)
