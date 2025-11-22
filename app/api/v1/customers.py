@@ -1,10 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.schemas.customer_schema import CustomerCreate, CustomerRead, CustomerQuery
 from app.schemas.pagination import Page
 from app.services.customer_service import CustomerService
 from app.db.session import get_connection
-from app.dependencies.auth import get_current_user
 from app.models.user import User
 from app.dependencies.roles import role_required
 
@@ -14,7 +13,7 @@ router = APIRouter()
 def create_customer(
         payload: CustomerCreate,
         db: Session = Depends(get_connection),
-        current_user: User =  Depends(role_required("admin"))
+        current_user: User =  Depends(role_required("admin", "user"))
 ):
     return CustomerService.create_customer(db, payload, current_user)
 
@@ -22,7 +21,7 @@ def create_customer(
 def list_customers(
     filters: CustomerQuery = Depends(),
     db: Session = Depends(get_connection),
-    current_user: User = Depends(role_required("admin"))
+    current_user: User = Depends(role_required("admin", "user"))
 ):
     return CustomerService.list_customers(db, filters, current_user)
 
@@ -30,43 +29,31 @@ def list_customers(
 def get_customer(
         customer_id: int,
         db: Session = Depends(get_connection),
-        current_user: User = Depends(role_required("admin"))
+        current_user: User = Depends(role_required("admin", "user"))
 ):
-    customer = CustomerService.get_customer(db, customer_id, current_user)
-    if not customer:
-        raise HTTPException(status_code=404, detail="Customer not found")
-    return customer
+    return CustomerService.get_customer(db, customer_id, current_user)
 
 @router.put("/{customer_id}", response_model=CustomerRead)
 def update_customer(
         customer_id: int,
         payload: CustomerCreate,
         db: Session = Depends(get_connection),
-        current_user: User = Depends(role_required("admin"))
+        current_user: User = Depends(role_required("admin", "user"))
 ):
-    updated_customer = CustomerService.update_customer(db, customer_id, payload, current_user)
-    if not updated_customer:
-        raise HTTPException(status_code=404, detail="Customer not found")
-    return updated_customer
+    return CustomerService.update_customer(db, customer_id, payload, current_user)
 
 @router.delete("/{customer_id}", response_model=bool)
 def delete_customer(
         customer_id: int,
         db: Session = Depends(get_connection),
-        current_user: User = Depends(role_required("admin"))
+        current_user: User = Depends(role_required("admin", "user"))
 ):
-    deleted = CustomerService.delete_customer(db, customer_id, current_user)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="Customer not found")
-    return deleted
+    return CustomerService.delete_customer(db, customer_id, current_user)
 
 @router.post("/{customer_id}/reactivate", response_model=CustomerRead)
 def reactivate_customer(
         customer_id: int,
         db: Session = Depends(get_connection),
-        current_user: User = Depends(role_required("admin"))
+        current_user: User = Depends(role_required("admin", "user"))
 ):
-    customer = CustomerService.reactivate_customer(db, customer_id, current_user)
-    if not customer:
-        raise HTTPException(status_code=404, detail="Customer not found")
-    return customer
+    return CustomerService.reactivate_customer(db, customer_id, current_user)
