@@ -16,13 +16,16 @@ class CustomerService:
     # CREATE
     # =========================
     @staticmethod
-    def create_customer(db: Session, customer: CustomerCreate) -> CustomerRead:
+    def create_customer(db: Session, customer: CustomerCreate, user: str) -> CustomerRead:
         # Validación de negocio: email único
-        if customer.email:
-            if CustomerRepository.get_by_email(db, str(customer.email)):
+        if customer.email and CustomerRepository.get_by_email(db, str(customer.email)):
                 raise HTTPException(status_code=400, detail="Email already exists")
 
-        entity = Customer(**customer.model_dump())
+        entity = Customer(
+            **customer.model_dump(),
+            created_by=user,
+            updated_by=user
+        )
 
         db.add(entity)
         db.commit()
@@ -88,8 +91,8 @@ class CustomerService:
     # UPDATE
     # =========================
     @staticmethod
-    def update_customer(db: Session, customer_id: int, payload: CustomerCreate) -> CustomerRead:
-        customer = CustomerRepository.update_customer(db, customer_id, payload)
+    def update_customer(db: Session, customer_id: int, payload: CustomerCreate, user: str) -> CustomerRead:
+        customer = CustomerRepository.update_customer(db, customer_id, payload, user)
         if not customer:
             raise HTTPException(status_code=404, detail="Customer not found")
         return CustomerRead.model_validate(customer)
@@ -98,8 +101,8 @@ class CustomerService:
     # DELETE
     # =========================
     @staticmethod
-    def delete_customer(db: Session, customer_id: int) -> bool:
-        deleted = CustomerRepository.soft_delete(db, customer_id)
+    def delete_customer(db: Session, customer_id: int, user: str) -> bool:
+        deleted = CustomerRepository.soft_delete(db, customer_id, user)
         if not deleted:
             raise HTTPException(status_code=404, detail="Customer not found")
         return True
