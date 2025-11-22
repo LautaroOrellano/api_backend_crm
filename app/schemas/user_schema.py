@@ -44,6 +44,14 @@ class UserMe(BaseModel):
     email: str
     full_name: str | None
     is_active: bool
+    role: str
 
     class Config:
         orm_mode = True
+
+# -----------------------------
+# Token
+# -----------------------------
+class Token(BaseModel):
+    access_token: str
+    token_type: str
