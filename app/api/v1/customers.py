@@ -6,13 +6,15 @@ from app.services.customer_service import CustomerService
 from app.db.session import get_connection
 from app.dependencies.auth import get_current_user
 from app.models.user import User
+from app.dependencies.roles import role_required
+
 router = APIRouter()
 
 @router.post("/", response_model=CustomerRead)
 def create_customer(
         payload: CustomerCreate,
         db: Session = Depends(get_connection),
-        current_user: User =  Depends(get_current_user)
+        current_user: User =  Depends(role_required("admin"))
 ):
     return CustomerService.create_customer(db, payload, current_user)
 
@@ -20,7 +22,7 @@ def create_customer(
 def list_customers(
     filters: CustomerQuery = Depends(),
     db: Session = Depends(get_connection),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(role_required("admin"))
 ):
     return CustomerService.list_customers(db, filters, current_user)
 
@@ -28,7 +30,7 @@ def list_customers(
 def get_customer(
         customer_id: int,
         db: Session = Depends(get_connection),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(role_required("admin"))
 ):
     customer = CustomerService.get_customer(db, customer_id, current_user)
     if not customer:
@@ -40,7 +42,7 @@ def update_customer(
         customer_id: int,
         payload: CustomerCreate,
         db: Session = Depends(get_connection),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(role_required("admin"))
 ):
     updated_customer = CustomerService.update_customer(db, customer_id, payload, current_user)
     if not updated_customer:
@@ -51,7 +53,7 @@ def update_customer(
 def delete_customer(
         customer_id: int,
         db: Session = Depends(get_connection),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(role_required("admin"))
 ):
     deleted = CustomerService.delete_customer(db, customer_id, current_user)
     if not deleted:
