@@ -1,21 +1,17 @@
 # repositories/customer_repository.py
-from datetime import datetime
 
 from sqlalchemy.orm import Session
 from typing import List, Optional
-
-from app.schemas.customer_schema import CustomerCreate
 from app.models.customer import Customer
 
 class CustomerRepository:
 
     @staticmethod
-    def insert_customer(db: Session, payload: CustomerCreate) -> Customer:
-        db_customer = Customer(**payload.model_dump())
-        db.add(db_customer)
+    def insert_customer(db: Session, entity: Customer) -> Customer:
+        db.add(entity)
         db.commit()
-        db.refresh(db_customer)
-        return db_customer
+        db.refresh(entity)
+        return entity
 
     @staticmethod
     def base_query(db: Session):
@@ -34,30 +30,14 @@ class CustomerRepository:
         return CustomerRepository.base_query(db).filter(Customer.id == customer_id).first()
 
     @staticmethod
-    def update_customer(
-            db: Session,
-            customer_id: int,
-            payload: CustomerCreate
-    ) -> Optional[Customer]:
-        db_customer: Optional[Customer] = db.query(Customer).filter(Customer.id == customer_id).first()
-        if not db_customer:
-            return None
-
-        for key, value in payload.model_dump(exclude_unset=True).items():
-            setattr(db_customer, key, value)
-
+    def update_customer(db: Session, customer: Customer) -> Customer:
         db.commit()
-        db.refresh(db_customer)
+        db.refresh(customer)
+        return customer
 
-        return db_customer
 
     @staticmethod
-    def soft_delete(db: Session, customer_id: int) -> bool:
-        customer = db.query(Customer).filter(Customer.id == customer_id).first()
-        if not customer:
-            return False
+    def soft_delete(db: Session, customer: Customer) -> None:
         customer.is_deleted = True
-        customer.deleted_at = datetime.now()
         db.commit()
-        return True
 

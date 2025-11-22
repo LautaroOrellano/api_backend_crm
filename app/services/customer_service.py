@@ -1,13 +1,12 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-
-from typing import Optional
-
+from datetime import datetime, timezone
 from app.repositories.customer_filter_repository import CustomerFilterRepository
-from app.schemas.customer_schema import CustomerCreate, CustomerRead, CustomerQuery
+from app.schemas.customer_schema import CustomerCreate, CustomerRead
 from app.schemas.pagination import Page
 from app.models.customer import Customer
 from app.repositories.customer_repository import CustomerRepository
+from app.models.user import User
 
 
 class CustomerService:
@@ -16,26 +15,27 @@ class CustomerService:
     # CREATE
     # =========================
     @staticmethod
-    def create_customer(db: Session, customer: CustomerCreate) -> CustomerRead:
+    def create_customer(db: Session, payload: CustomerCreate, user: User) -> CustomerRead:
         # Validación de negocio: email único
-        if customer.email:
-            if CustomerRepository.get_by_email(db, str(customer.email)):
+        if payload.email and CustomerRepository.get_by_email(db, str(payload.email)):
                 raise HTTPException(status_code=400, detail="Email already exists")
 
-        entity = Customer(**customer.model_dump())
+        entity = Customer(
+            **payload.model_dump(),
+            created_by=user.id,
+            updated_by=user.id
+        )
 
-        db.add(entity)
-        db.commit()
-        db.refresh(entity)
+        customer = CustomerRepository.insert_customer(db, entity)
 
-        return CustomerRead.model_validate(entity)
+        return CustomerRead.model_validate(customer)
 
     # =========================
     # LIST + FILTROS + PAGINACIÓN + ORDEN
     # =========================
+
     @staticmethod
-    @staticmethod
-    def list_customers(db: Session, filters) -> Page[CustomerRead]:
+    def list_customers(db: Session, filters, user: User) -> Page[CustomerRead]:
 
         # Validaciones básicas
         if filters.limit < 1 or filters.limit > 200:
@@ -51,6 +51,9 @@ class CustomerService:
 
         # FILTROS (repositorio)
         query = CustomerFilterRepository.filter_customers(db, filters)
+
+        # FILTRO: solo los clientes del usuario actual
+        query = query.filter(Customer.created_by == user.id)
 
         # TOTAL ITEMS (sin paginar)
         total_items = query.order_by(None).count()
@@ -78,28 +81,46 @@ class CustomerService:
     # GET ONE
     # =========================
     @staticmethod
-    def get_customer(db: Session, customer_id: int) -> CustomerRead:
+    def get_customer(db: Session, customer_id: int, user: User) -> CustomerRead:
         customer = CustomerRepository.get_customer_by_id(db, customer_id)
         if not customer:
             raise HTTPException(status_code=404, detail="Customer not found")
+
+        if customer.created_by != user.id:
+            raise HTTPException(status_code=403, detail="You do not have permission to view this customer")
+
         return CustomerRead.model_validate(customer)
 
     # =========================
     # UPDATE
     # =========================
     @staticmethod
-    def update_customer(db: Session, customer_id: int, payload: CustomerCreate) -> CustomerRead:
-        customer = CustomerRepository.update_customer(db, customer_id, payload)
+    def update_customer(db: Session, customer_id: int, payload: CustomerCreate, user: User) -> CustomerRead:
+        customer = CustomerRepository.get_customer_by_id(db, customer_id)
         if not customer:
             raise HTTPException(status_code=404, detail="Customer not found")
-        return CustomerRead.model_validate(customer)
+
+        for key, value in payload.model_dump(exclude_unset=True).items():
+            setattr(customer, key, value)
+
+        customer.updated_by = user.id
+
+        updated = CustomerRepository.update_customer(db, customer)
+
+        return CustomerRead.model_validate(updated)
 
     # =========================
     # DELETE
     # =========================
     @staticmethod
-    def delete_customer(db: Session, customer_id: int) -> bool:
-        deleted = CustomerRepository.soft_delete(db, customer_id)
-        if not deleted:
+    def delete_customer(db: Session, customer_id: int, user: User) -> bool:
+        customer = CustomerRepository.get_customer_by_id(db, customer_id)
+        if not customer:
             raise HTTPException(status_code=404, detail="Customer not found")
+
+        customer.deleted_by = user.id
+        customer.deleted_at = datetime.now(timezone.utc)
+
+        CustomerRepository.soft_delete(db, customer)
+
         return True

@@ -1,0 +1,17 @@
+# Entorno virtual
+.venv/
+venv/
+
+# Archivos sensibles
+.env
+*.env
+
+# Archivos de config locales
+settings.py  # (solo si contiene secretos — ideal mover todo a .env)
+
+# Compilados
+__pycache__/
+*.pyc
+
+# Archivos de logs
+*.log
