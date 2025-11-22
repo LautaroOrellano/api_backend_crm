@@ -53,7 +53,8 @@ class CustomerService:
         query = CustomerFilterRepository.filter_customers(db, filters)
 
         # FILTRO: solo los clientes del usuario actual
-        query = query.filter(Customer.created_by == user.id)
+        if user.role != "admin":
+            query = query.filter(Customer.created_by == user.id)
 
         # TOTAL ITEMS (sin paginar)
         total_items = query.order_by(None).count()
@@ -86,7 +87,7 @@ class CustomerService:
         if not customer:
             raise HTTPException(status_code=404, detail="Customer not found")
 
-        if customer.created_by != user.id:
+        if user.role != "admin" and customer.created_by != user.id:
             raise HTTPException(status_code=403, detail="You do not have permission to view this customer")
 
         return CustomerRead.model_validate(customer)
