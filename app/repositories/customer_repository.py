@@ -30,14 +30,25 @@ class CustomerRepository:
         return CustomerRepository.base_query(db).filter(Customer.id == customer_id).first()
 
     @staticmethod
+    def get_customer_by_id_for_reactivation(db: Session, customer_id: int) -> Optional[Customer]:
+        return db.query(Customer).filter(Customer.id == customer_id).first()
+
+    @staticmethod
     def update_customer(db: Session, customer: Customer) -> Customer:
         db.commit()
         db.refresh(customer)
         return customer
-
 
     @staticmethod
     def soft_delete(db: Session, customer: Customer) -> None:
         customer.is_deleted = True
         db.commit()
 
+    @staticmethod
+    def reactivate_customer(db: Session, customer: Customer) -> Customer:
+        customer.is_deleted = False
+        customer.deleted_at = None
+        customer.deleted_by = None
+        db.commit()
+        db.refresh(customer)
+        return customer
