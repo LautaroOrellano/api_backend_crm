@@ -21,7 +21,7 @@ def login(username: str = Form(...), password: str = Form(...), db: Session = De
 
     access_token_expires = timedelta(minutes=int(settings.ACCESS_TOKEN_EXPIRE_MINUTES))
     access_token = create_access_token(
-        data={"sub": user.username, "role": getattr(user, "role", "admin")},
+        data={"sub": user.username, "role": getattr(user, "role", "user")},
         expires_delta=access_token_expires
     )
 
