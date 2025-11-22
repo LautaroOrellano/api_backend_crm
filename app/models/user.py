@@ -1,5 +1,6 @@
+# app/models/user.py
 from app.db.base import Base
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime
 from datetime import datetime, timezone
 from app.core.security import pwd_context
 
@@ -11,10 +12,17 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     full_name = Column(String, nullable=True)
     hashed_password = Column(String, nullable=False)
-    is_active = Column(Boolean, default=True)
+    role = Column(String, default="user")
+
+    is_deleted = Column(Boolean, default=False, nullable=False)
+    deleted_at = Column(DateTime, nullable=True)
+
+    # Auditoría
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
-    role = Column(String, default="user")
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    updated_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    deleted_by = Column(Integer, ForeignKey("users.id"), nullable=True)
 
     # Métodos auxiliares
     def verify_password(self, password: str) -> bool:

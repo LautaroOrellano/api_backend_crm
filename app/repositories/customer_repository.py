@@ -1,5 +1,4 @@
 # repositories/customer_repository.py
-
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.models.customer import Customer

@@ -1,3 +1,4 @@
+# app/service/customer_service.py
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from datetime import datetime, timezone
@@ -7,7 +8,6 @@ from app.schemas.pagination import Page
 from app.models.customer import Customer
 from app.repositories.customer_repository import CustomerRepository
 from app.models.user import User
-
 
 class CustomerService:
 
@@ -33,7 +33,6 @@ class CustomerService:
     # =========================
     # LIST + FILTROS + PAGINACIÓN + ORDEN
     # =========================
-
     @staticmethod
     def list_customers(db: Session, filters, user: User) -> Page[CustomerRead]:
 
@@ -129,6 +128,7 @@ class CustomerService:
     # =========================
     # REACTIVE
     # =========================
+    @staticmethod
     def reactivate_customer(db: Session, customer_id: int, user: User) -> CustomerRead:
         customer = CustomerRepository.get_customer_by_id_for_reactivation(db, customer_id)
         if not customer:

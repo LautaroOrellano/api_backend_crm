@@ -1,8 +1,6 @@
 # app/repositories/customer_filter_repository.py
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
-from typing import Optional
-from datetime import datetime
 
 from app.models.customer import Customer
 from app.schemas.customer_schema import CustomerQuery
