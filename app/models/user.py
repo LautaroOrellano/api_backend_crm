@@ -14,7 +14,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
-    role = Column(String, default="admin")
+    role = Column(String, default="user")
 
     # Métodos auxiliares
     def verify_password(self, password: str) -> bool:
