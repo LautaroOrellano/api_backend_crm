@@ -1,6 +1,6 @@
 from app.db.base import Base
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 from app.core.security import pwd_context
 
 class User(Base):
@@ -12,8 +12,8 @@ class User(Base):
     full_name = Column(String, nullable=True)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.now(UTC))
-    updated_at = Column(DateTime, default=datetime.now(UTC), onupdate=datetime.now(UTC))
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     # Métodos auxiliares
     def verify_password(self, password: str) -> bool:

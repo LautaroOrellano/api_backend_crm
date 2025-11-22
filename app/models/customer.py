@@ -1,6 +1,6 @@
 # app/models/customer.py
-from datetime import datetime
-from sqlalchemy import Column, Boolean, Integer, String, DateTime, JSON, Enum as SAEnum
+from datetime import datetime, timezone
+from sqlalchemy import Column, Boolean, Integer, String, DateTime, JSON, Enum as SAEnum, ForeignKey
 from app.db.base import Base
 from app.enums.lead_status import LeadStatus
 from app.enums.lead_source import LeadSource
@@ -19,8 +19,12 @@ class Customer(Base):
     notes = Column(String(255), nullable=True)
     tags = Column(JSON, default=list)
 
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
     is_deleted = Column(Boolean, default=False, nullable=False)
-    deleted_at = Column(DateTime, nullable=False)
+    deleted_at = Column(DateTime, nullable=True)
+
+    # Auditoría
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    updated_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    deleted_by = Column(Integer, ForeignKey("users.id"), nullable=True)
