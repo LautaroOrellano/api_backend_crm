@@ -59,3 +59,14 @@ def delete_customer(
     if not deleted:
         raise HTTPException(status_code=404, detail="Customer not found")
     return deleted
+
+@router.post("/{customer_id}/reactivate", response_model=CustomerRead)
+def reactivate_customer(
+        customer_id: int,
+        db: Session = Depends(get_connection),
+        current_user: User = Depends(role_required("admin"))
+):
+    customer = CustomerService.reactivate_customer(db, customer_id, current_user)
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    return customer
