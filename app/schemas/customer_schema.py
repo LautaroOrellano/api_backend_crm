@@ -73,11 +73,17 @@ class CustomerQuery(BaseModel):
     source: Optional[str] = None
     status: Optional[str] = None
     q: Optional[str] = None
+
+    # Paginación
     limit: int = Field(20, ge=1, le=100)
     offset: int = Field(0, ge=0)
+
+    # Ordenamiento
     order_by: str = "created_at"
     order_dir: str = "desc"
 
     # Filtros avanzados
     created_from: Optional[datetime] = None
     created_to: Optional[datetime] = None
+    updated_from: Optional[datetime] = None
+    updated_to: Optional[datetime] = None
