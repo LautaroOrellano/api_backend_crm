@@ -45,7 +45,7 @@ class UserMe(BaseModel):
     username: str
     email: str
     full_name: str | None
-    is_active: bool
+    is_deleted: bool
     role: str
 
     class Config:
