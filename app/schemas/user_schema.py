@@ -45,7 +45,7 @@ class UserMe(BaseModel):
     username: str
     email: str
     full_name: str | None
-    is_active: bool
+    is_deleted: bool
     role: str
 
     class Config:
@@ -56,6 +56,7 @@ class UserMe(BaseModel):
 # -----------------------------
 class Token(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str
 
 # =========================

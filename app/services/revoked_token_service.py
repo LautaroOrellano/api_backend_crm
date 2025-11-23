@@ -1,6 +1,6 @@
 # app/services/revoked_token_service.py
 from sqlalchemy.orm import Session
-from app.models.revoked_token import RevokedToken
+from app.models.security.user_tokens import RevokedToken
 
 class RevokedTokenService:
     @staticmethod
