@@ -62,14 +62,33 @@ class UserToken(Base):
     # Expiración real del token
     expires_at = Column(DateTime(timezone=True), nullable=False)
 
-
     def is_expired(self) -> bool:
         """Devuelve True si el token ya expiró."""
         return datetime.now(timezone.utc) >= self.expires_at
+
+    def to_revoked_dict(self, reason: str | None = None) -> dict:
+        """Devuelve un dict listo para usar en RevokedToken, con valores seguros para MyPy."""
+        now = datetime.now(timezone.utc)
+        return {
+            "jti": str(self.jti),
+            "user_id": int(self.user_id) if self.user_id is not None else None,
+            "revoked_by": int(self.revoked_by) if self.revoked_by is not None else None,
+            "revoked_reason": reason or self.revoked_reason,
+            "device_id": self.device_id,
+            "ip_address": self.ip_address,
+            "user_agent": self.user_agent,
+            "revoked_at": now
+        }
 
 class RevokedToken(Base):
     __tablename__ = "revoked_tokens"
 
     id = Column(Integer, primary_key=True, index=True)
-    jti = Column(String, unique=True, index=True, nullable=False)
-    revoked_at = Column(DateTime(timezone=True), default=datetime.now(timezone.utc))
+    jti = Column(String, unique=False, index=True, nullable=False)
+    user_id = Column(Integer, nullable=True)
+    revoked_by = Column(Integer, nullable=True)
+    revoked_reason = Column(String, nullable=True)
+    device_id = Column(String, nullable=True)
+    ip_address = Column(String, nullable=True)
+    user_agent = Column(String, nullable=True)
+    revoked_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
