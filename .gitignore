@@ -5,6 +5,7 @@ venv/
 # Archivos sensibles
 .env
 *.env
+keys/
 
 # Archivos de config locales
 settings.py  # (solo si contiene secretos — ideal mover todo a .env)
