@@ -2,7 +2,7 @@
 from app.db.base import Base
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime
 from datetime import datetime, timezone
-from app.core.security import pwd_context
+from sqlalchemy.orm import relationship
 
 class User(Base):
     __tablename__ = "users"
@@ -23,10 +23,4 @@ class User(Base):
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     updated_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     deleted_by = Column(Integer, ForeignKey("users.id"), nullable=True)
-
-    # Métodos auxiliares
-    def verify_password(self, password: str) -> bool:
-        return pwd_context.verify(password, self.hashed_password)
-
-    def set_password(self, password: str):
-        self.hashed_password = pwd_context.hash(password)
+    security_info = relationship("UserSecurityInfo", back_populates="user", uselist=False)
