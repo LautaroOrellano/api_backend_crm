@@ -37,7 +37,9 @@ def login(
     db: Session = Depends(get_connection)
 ):
     # Buscar usuario
-    user: Optional[User] = db.query(User).filter(User.username == username).first()
+    user: Optional[User] = db.query(User).filter(
+        (User.username == username) | (User.email == username)
+    ).first()
     if not user:
         raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectos")
 
