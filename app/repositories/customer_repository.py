@@ -2,6 +2,7 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.models.customer import Customer
+from app.enums.lead_status import LeadStatus
 
 class CustomerRepository:
 
@@ -51,3 +52,16 @@ class CustomerRepository:
         db.commit()
         db.refresh(customer)
         return customer
+
+
+
+    @staticmethod
+    def count_all_customers(db: Session, user_id: int = None, is_admin: bool = False) -> int:
+        query = CustomerRepository.base_query(db)  # ya filtra is_deleted == False
+
+        # Si no es admin, solo los del usuario
+        if not is_admin and user_id:
+            query = query.filter(Customer.created_by == user_id)
+
+        return query.count()
+

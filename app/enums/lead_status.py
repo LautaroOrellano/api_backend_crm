@@ -1,7 +1,8 @@
 from enum import Enum
 
 class LeadStatus(str, Enum):
-    NEW = "new"
-    CONTACTED = "contacted"
-    QUALIFIED = "qualified"
-    LOST = "lost"
+    NEW = "NEW"
+    ACTIVE = "ACTIVE"
+    CONTACTED = "CONTACTED"
+    QUALIFIED = "QUALIFIED"
+    LOST = "LOST"
