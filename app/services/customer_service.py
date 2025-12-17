@@ -78,6 +78,17 @@ class CustomerService:
         )
 
     # =========================
+    # GET CANT TOTAL ACTIVE LEADS
+    # =========================
+    @staticmethod
+    def count_all_customers(db: Session, user: User) -> int:
+        return CustomerRepository.count_all_customers(
+            db,
+            user_id=user.id,
+            is_admin=user.role == "admin"
+        )
+
+    # =========================
     # GET ONE
     # =========================
     @staticmethod

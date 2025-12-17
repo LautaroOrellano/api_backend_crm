@@ -6,6 +6,7 @@ from app.services.customer_service import CustomerService
 from app.db.session import get_connection
 from app.models.user import User
 from app.dependencies.roles import role_required
+from fastapi import Query
 
 router = APIRouter()
 
@@ -16,6 +17,13 @@ def create_customer(
         current_user: User =  Depends(role_required("admin", "user"))
 ):
     return CustomerService.create_customer(db, payload, current_user)
+
+@router.get("/count", response_model=int)
+def count_customers(
+        db: Session = Depends(get_connection),
+        current_user: User = Depends(role_required("admin", "user"))
+):
+    return CustomerService.count_all_customers(db, current_user)
 
 @router.get("/", response_model=Page[CustomerRead])
 def list_customers(
@@ -49,6 +57,7 @@ def delete_customer(
         current_user: User = Depends(role_required("admin", "user"))
 ):
     return CustomerService.delete_customer(db, customer_id, current_user)
+
 
 @router.post("/{customer_id}/reactivate", response_model=CustomerRead)
 def reactivate_customer(
