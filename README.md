@@ -1,5 +1,9 @@
 # Proyecto Customer Manager API - Documentación Técnica
 
+![Python](https://img.shields.io/badge/python-3.11-blue.svg)
+![License](https://img.shields.io/badge/license-GPLv3-green.svg)
+
+
 ## Visión General
 Este proyecto es una API Backend robusta y escalable construida con **FastAPI**, diseñada para la gestión de clientes y usuarios. Implementa una **arquitectura por capas** (Layered Architecture) que separa claramente las responsabilidades, facilitando el mantenimiento y la escalabilidad del software.
 
@@ -58,10 +62,63 @@ Cuando el Frontend solicita "Crear un Cliente":
 4.  **Database**: Guarda el registro.
 5.  **Respuesta**: El dato guardado sube por las capas y se devuelve como JSON al Frontend.
 
-## Cómo Iniciar (Resumen)
+## 🛠️ Instalación y Configuración
 
-El archivo `main.py` es el punto de entrada. Típicamente se ejecuta con un servidor ASGI como **Uvicorn**:
+Sigue estos pasos para levantar el proyecto localmente:
+
+1.  **Clonar el repositorio**
+    ```bash
+    git clone https://github.com/tu-usuario/ClienteManager.git
+    cd ClienteManager
+    ```
+
+2.  **Configurar Entorno Virtual**
+    ```bash
+    python -m venv .venv
+    # Windows
+    .venv\Scripts\activate
+    # Mac/Linux
+    source .venv/bin/activate
+    ```
+
+3.  **Instalar Dependencias**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4.  **Configurar Variables de Entorno**
+    Copia el archivo de ejemplo y configúralo con tus datos:
+    ```bash
+    cp .env.example .env
+    # Edita .env con tus credenciales de base de datos
+    ```
+    También asegúrate de tener `alembic.ini` (puedes copiar `alembic.ini.example` a `alembic.ini`).
+
+5.  **Generar Claves de Seguridad** (Importante)
+    Este proyecto usa cifrado RSA. Genera las claves antes de iniciar:
+    ```bash
+    python scripts/generate_keys.py
+    ```
+
+6.  **Base de Datos (Migraciones)**
+    ```bash
+    alembic upgrade head
+    ```
+
+7.  **Ejecutar Servidor**
+    ```bash
+    uvicorn main:app --reload
+    ```
+
+## 🧪 Tests
+
+Para ejecutar las pruebas:
 
 ```bash
-uvicorn main:app --reload
+pytest
 ```
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia **GPLv3**. Ver el archivo [LICENSE](LICENSE) para más detalles.
+
