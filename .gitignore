@@ -9,7 +9,7 @@ keys/
 alembic.ini
 
 # Archivos de config locales
-settings.py  # (solo si contiene secretos — ideal mover todo a .env)
+settings.py  
 
 # Compilados
 __pycache__/
