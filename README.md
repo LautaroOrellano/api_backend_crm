@@ -62,7 +62,7 @@ Cuando el Frontend solicita "Crear un Cliente":
 4.  **Database**: Guarda el registro.
 5.  **Respuesta**: El dato guardado sube por las capas y se devuelve como JSON al Frontend.
 
-## 🛠️ Instalación y Configuración
+## Instalación y Configuración
 
 Sigue estos pasos para levantar el proyecto localmente:
 
@@ -110,7 +110,7 @@ Sigue estos pasos para levantar el proyecto localmente:
     uvicorn main:app --reload
     ```
 
-## 🧪 Tests
+## Tests
 
 Para ejecutar las pruebas:
 
@@ -118,7 +118,7 @@ Para ejecutar las pruebas:
 pytest
 ```
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto está bajo la Licencia **GPLv3**. Ver el archivo [LICENSE](LICENSE) para más detalles.
 
